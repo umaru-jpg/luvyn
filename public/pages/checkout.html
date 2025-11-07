@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Luvyn</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Konfigurasi Tailwind untuk tema Emas (Yellow-400) dan Hitam -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-gold': '#FACC15', // Tailwind yellow-400
+                        'dark-bg': '#000000',
+                        'light-text': '#E5E7EB', // Slightly off-white for better readability on black
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Menggunakan font Inter dari Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
+        /* Efek cahaya/glow minimalis untuk elemen penting */
+        .glow-text {
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.4);
+        }
+        .glow-border {
+            box-shadow: 0 0 10px rgba(250, 202, 21, 0.5); /* Sinar Emas */
+        }
+        .product-card:hover .glow-effect {
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+
+<body class="bg-dark-bg text-light-text font-sans antialiased min-h-screen flex flex-col">
+    <!-- Header & Navigation -->
+    <header class="sticky top-0 z-50 bg-dark-bg bg-opacity-95 backdrop-blur-sm shadow-md">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <a href="./index.html" class="text-3xl font-bold text-primary-gold glow-text tracking-widest">Luvyn</a>
+            <div class="hidden md:flex space-x-8 items-center text-lg">
+                <a href="./index.html" class="hover:text-primary-gold transition duration-200">Home</a>
+                <a href="./shop.html" class="hover:text-primary-gold transition duration-200">Koleksi</a>
+                <a href="./about.html" class="hover:text-primary-gold transition duration-200">Tentang Kami</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <a href="./cart.html" class="relative p-2 rounded-full hover:bg-white/10 transition duration-200">
+                    <!-- Icon Keranjang SVG -->
+                    <svg class="w-6 h-6 text-light-text" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    <span id="cart-count" class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-black transform translate-x-1/2 -translate-y-1/2 bg-primary-gold rounded-full">0</span>
+                </a>
+                <button id="mobile-menu-button" class="md:hidden p-2 rounded-full hover:bg-white/10 transition duration-200">
+                    <svg class="w-6 h-6 text-light-text" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 w-full">
+        <h2 class="text-4xl font-extrabold text-primary-gold mb-8 border-b border-white/10 pb-4">Checkout</h2>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Formulir Alamat & Pembayaran -->
+            <div class="bg-white/5 p-6 rounded-xl border border-white/10">
+                <h3 class="text-2xl font-bold mb-6 text-light-text">Detail Pemesanan</h3>
+                
+                <form id="checkout-form">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-light-text mb-2" for="name">Nama Lengkap</label>
+                            <input type="text" id="name" class="w-full p-3 rounded-lg bg-dark-bg border border-white/20 text-light-text focus:outline-none focus:ring-2 focus:ring-primary-gold" placeholder="Masukkan nama lengkap Anda">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-light-text mb-2" for="phone">Nomor Telepon</label>
+                            <input type="tel" id="phone" class="w-full p-3 rounded-lg bg-dark-bg border border-white/20 text-light-text focus:outline-none focus:ring-2 focus:ring-primary-gold" placeholder="Masukkan nomor telepon Anda">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-light-text mb-2" for="address">Alamat Lengkap</label>
+                            <textarea id="address" rows="4" class="w-full p-3 rounded-lg bg-dark-bg border border-white/20 text-light-text focus:outline-none focus:ring-2 focus:ring-primary-gold" placeholder="Masukkan alamat lengkap Anda"></textarea>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-light-text mb-2">Metode Pembayaran</label>
+                            <div class="space-y-3">
+                                <div class="flex items-center">
+                                    <input type="radio" id="dana" name="payment" value="DANA" class="h-4 w-4 text-primary-gold focus:ring-primary-gold" checked>
+                                    <label for="dana" class="ml-2 text-light-text">DANA</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" id="gopay" name="payment" value="GoPay" class="h-4 w-4 text-primary-gold focus:ring-primary-gold">
+                                    <label for="gopay" class="ml-2 text-light-text">GoPay</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" id="ovo" name="payment" value="OVO" class="h-4 w-4 text-primary-gold focus:ring-primary-gold">
+                                    <label for="ovo" class="ml-2 text-light-text">OVO</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" id="shopeepay" name="payment" value="ShopeePay" class="h-4 w-4 text-primary-gold focus:ring-primary-gold">
+                                    <label for="shopeepay" class="ml-2 text-light-text">ShopeePay</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Ringkasan Pesanan -->
+            <div class="bg-white/5 p-6 rounded-xl border border-white/10" id="order-summary">
+                <!-- Ringkasan pesanan akan diisi oleh JavaScript -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark-bg border-t border-white/10 mt-12 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-500 text-sm">
+            <p>&copy; 2024 Luvyn. Pencahayaan adalah Ekspresi Diri Anda.</p>
+            <p class="mt-2">Dirancang dengan Elegan. Dibuat dengan Hati.</p>
+        </div>
+    </footer>
+
+    <!-- Modal QR Code -->
+    <div id="qr-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-dark-bg rounded-xl border border-white/10 max-w-2xl w-11/12 max-h-[95vh] overflow-y-auto p-10 relative">
+            <h3 class="text-3xl font-bold text-light-text mb-8 text-center">Pembayaran DANA</h3>
+            
+            <div class="flex justify-center mb-8">
+                <!-- Placeholder untuk QR Code -->
+                <div class="bg-white p-8 rounded-xl">
+                    <div class="bg-gray-200 border-2 border-dashed rounded-xl w-80 h-80 flex items-center justify-center text-gray-500">
+                        QR CODE
+                    </div>
+                </div>
+            </div>
+            
+            <p class="text-center text-2xl text-light-text mb-6">Total Pembayaran: <span id="total-amount" class="text-primary-gold font-bold"></span></p>
+            <p class="text-center text-gray-400 text-xl mb-10">Silakan scan QR code di atas untuk menyelesaikan pembayaran</p>
+            
+            <div class="flex justify-center gap-6">
+                <button id="confirm-payment" class="flex-1 bg-primary-gold text-dark-bg py-4 px-6 rounded-lg font-bold hover:bg-yellow-300 transition duration-300 text-xl">
+                    Saya Telah Membayar
+                </button>
+                
+                <button id="close-qr-modal" class="p-4 text-gray-400 hover:text-light-text bg-white/10 rounded-lg self-start">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Terima Kasih -->
+    <div id="thank-you-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-dark-bg rounded-xl border border-white/10 max-w-2xl w-11/12 max-h-[95vh] overflow-y-auto p-10 relative">
+            <div class="text-center">
+                <div class="w-24 h-24 bg-primary-gold rounded-full flex items-center justify-center mx-auto mb-8">
+                    <svg class="w-12 h-12 text-dark-bg" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                
+                <h3 class="text-4xl font-bold text-light-text mb-6">Terima Kasih!</h3>
+                <p class="text-gray-400 text-2xl mb-8">Pesanan Anda telah berhasil diproses.</p>
+                
+                <div id="order-details" class="text-left bg-white/5 p-8 rounded-xl mb-10 text-lg">
+                    <!-- Detail pesanan akan diisi oleh JavaScript -->
+                </div>
+                
+                <div class="flex justify-center gap-6">
+                    <button id="close-thank-you-modal" class="flex-1 bg-primary-gold text-dark-bg py-4 px-6 rounded-lg font-bold hover:bg-yellow-300 transition duration-300 text-xl">
+                        Tutup
+                    </button>
+                    
+                    <button id="close-thank-you-modal-alt" class="p-4 text-gray-400 hover:text-light-text bg-white/10 rounded-lg self-start">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="../shared.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCartCount();
+            renderOrderSummary();
+            
+            // Set event listeners untuk modal
+            document.getElementById('confirm-payment').addEventListener('click', function() {
+                document.getElementById('qr-modal').classList.add('hidden');
+                document.getElementById('thank-you-modal').classList.remove('hidden');
+                showOrderDetails();
+                // Kosongkan keranjang setelah pembayaran
+                appState.cart = [];
+                saveCartToLocalStorage();
+                updateCartCount();
+            });
+            
+            document.getElementById('close-qr-modal').addEventListener('click', function() {
+                document.getElementById('qr-modal').classList.add('hidden');
+            });
+            
+            document.getElementById('close-thank-you-modal').addEventListener('click', function() {
+                document.getElementById('thank-you-modal').classList.add('hidden');
+                // Redirect ke halaman utama setelah menutup modal
+                window.location.href = './index.html';
+            });
+            
+            document.getElementById('close-thank-you-modal-alt').addEventListener('click', function() {
+                document.getElementById('thank-you-modal').classList.add('hidden');
+                // Redirect ke halaman utama setelah menutup modal
+                window.location.href = './index.html';
+            });
+        });
+
+        function renderOrderSummary() {
+            const subtotal = appState.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const shipping = 50000; // Contoh biaya pengiriman
+            const total = subtotal + shipping;
+
+            const orderSummaryHtml = `
+                <h3 class="text-2xl font-bold mb-6 text-light-text border-b border-white/10 pb-3">Ringkasan Pesanan</h3>
+                
+                <div class="space-y-4 mb-6">
+                    ${appState.cart.map(item => `
+                        <div class="flex justify-between items-center border-b border-white/10 pb-3">
+                            <div>
+                                <p class="font-medium text-light-text">${item.name}</p>
+                                <p class="text-sm text-gray-400">Qty: ${item.quantity}</p>
+                            </div>
+                            <p class="font-bold text-light-text">${formatRupiah(item.price * item.quantity)}</p>
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <div class="space-y-3 text-lg border-t border-white/10 pt-4">
+                    <div class="flex justify-between">
+                        <span>Subtotal:</span>
+                        <span>${formatRupiah(subtotal)}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Biaya Pengiriman:</span>
+                        <span>${formatRupiah(shipping)}</span>
+                    </div>
+                    <div class="flex justify-between font-bold text-xl text-primary-gold border-t border-primary-gold pt-3">
+                        <span>Total:</span>
+                        <span>${formatRupiah(total)}</span>
+                    </div>
+                </div>
+                
+                <button id="place-order-btn" class="mt-8 w-full bg-primary-gold text-dark-bg text-lg font-bold py-3 rounded-full hover:bg-yellow-300 transition duration-300">
+                    Buat Pesanan
+                </button>
+            `;
+
+            document.getElementById('order-summary').innerHTML = orderSummaryHtml;
+            
+            // Set event listener untuk tombol buat pesanan
+            document.getElementById('place-order-btn').addEventListener('click', function() {
+                if(validateForm()) {
+                    const total = (appState.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0) + 50000);
+                    document.getElementById('total-amount').textContent = formatRupiah(total);
+                    document.getElementById('qr-modal').classList.remove('hidden');
+                }
+            });
+        }
+
+        function validateForm() {
+            const name = document.getElementById('name').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const address = document.getElementById('address').value.trim();
+            
+            if (!name || !phone || !address) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Mohon lengkapi semua data pemesanan',
+                    background: '#000000',
+                    color: '#E5E7EB',
+                    iconColor: '#F87171',
+                    confirmButtonColor: '#FACC15',
+                });
+                return false;
+            }
+            
+            return true;
+        }
+
+        function showOrderDetails() {
+            const orderDetails = {
+                name: document.getElementById('name').value,
+                phone: document.getElementById('phone').value,
+                address: document.getElementById('address').value,
+                paymentMethod: document.querySelector('input[name="payment"]:checked').value,
+                items: appState.cart,
+                subtotal: appState.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+                shipping: 50000,
+                total: appState.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0) + 50000
+            };
+
+            const orderDetailsHtml = `
+                <p><span class="font-semibold">Nama:</span> ${orderDetails.name}</p>
+                <p><span class="font-semibold">Telepon:</span> ${orderDetails.phone}</p>
+                <p><span class="font-semibold">Alamat:</span> ${orderDetails.address}</p>
+                <p><span class="font-semibold">Metode Pembayaran:</span> ${orderDetails.paymentMethod}</p>
+                <p class="mt-2"><span class="font-semibold">Subtotal:</span> ${formatRupiah(orderDetails.subtotal)}</p>
+                <p><span class="font-semibold">Pengiriman:</span> ${formatRupiah(orderDetails.shipping)}</p>
+                <p class="font-bold text-primary-gold"><span class="font-semibold">Total:</span> ${formatRupiah(orderDetails.total)}</p>
+            `;
+
+            document.getElementById('order-details').innerHTML = orderDetailsHtml;
+        }
+    </script>
+</body>
+</html>
