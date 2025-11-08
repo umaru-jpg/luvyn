@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Koleksi Produk - Luvyn</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Konfigurasi Tailwind untuk tema Emas (Yellow-400) dan Hitam -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-gold': '#FACC15', // Tailwind yellow-400
+                        'dark-bg': '#000000',
+                        'light-text': '#E5E7EB', // Slightly off-white for better readability on black
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Menggunakan font Inter dari Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
+        /* Efek cahaya/glow minimalis untuk elemen penting */
+        .glow-text {
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.4);
+        }
+        .glow-border {
+            box-shadow: 0 0 10px rgba(250, 202, 21, 0.5); /* Sinar Emas */
+        }
+        .product-card:hover .glow-effect {
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+
+<body class="bg-dark-bg text-light-text font-sans antialiased min-h-screen flex flex-col">
+    <!-- Header & Navigation -->
+    <header class="sticky top-0 z-50 bg-dark-bg bg-opacity-95 backdrop-blur-sm shadow-md">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <a href="./index.html" class="text-3xl font-bold text-primary-gold glow-text tracking-widest">Luvyn</a>
+            <div class="hidden md:flex space-x-8 items-center text-lg">
+                <a href="./index.html" class="hover:text-primary-gold transition duration-200">Home</a>
+                <a href="./shop.html" class="hover:text-primary-gold transition duration-200">Koleksi</a>
+                <a href="./about.html" class="hover:text-primary-gold transition duration-200">Tentang Kami</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <a href="./cart.html" class="relative p-2 rounded-full hover:bg-white/10 transition duration-200">
+                    <!-- Icon Keranjang SVG -->
+                    <svg class="w-6 h-6 text-light-text" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    <span id="cart-count" class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-black transform translate-x-1/2 -translate-y-1/2 bg-primary-gold rounded-full">0</span>
+                </a>
+                <button id="mobile-menu-button" class="md:hidden p-2 rounded-full hover:bg-white/10 transition duration-200">
+                    <svg class="w-6 h-6 text-light-text" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+        <h2 class="text-5xl font-extrabold text-primary-gold mb-10 border-b border-white/10 pb-4">Koleksi Pencahayaan</h2>
+
+        <div class="flex flex-col md:flex-row gap-8">
+            <!-- Filter Section (Left Sidebar) -->
+            <div class="md:w-1/4 lg:w-1/5 bg-white/5 p-6 rounded-xl border border-white/10 h-fit sticky top-24 self-start">
+                <h3 class="text-xl font-semibold mb-4 text-light-text">Filter Produk</h3>
+                
+                <div class="mb-6">
+                    <p class="font-medium mb-2 text-primary-gold">Tipe Produk:</p>
+                    <div class="space-y-2">
+                        <button onclick="handleFilterChange('category', 'Semua')" class="w-full text-left px-4 py-2 text-sm rounded-lg transition duration-200 bg-primary-gold text-dark-bg font-bold" id="filter-category-Semua">Semua</button>
+                        <button onclick="handleFilterChange('category', 'Dekoratif')" class="w-full text-left px-4 py-2 text-sm rounded-lg transition duration-200 bg-white/10 hover:bg-white/20 text-light-text" id="filter-category-Dekoratif">Dekoratif</button>
+                        <button onclick="handleFilterChange('category', 'Fungsional')" class="w-full text-left px-4 py-2 text-sm rounded-lg transition duration-200 bg-white/10 hover:bg-white/20 text-light-text" id="filter-category-Fungsional">Fungsional</button>
+                        <button onclick="handleFilterChange('category', 'Pencahayaan Rumah')" class="w-full text-left px-4 py-2 text-sm rounded-lg transition duration-200 bg-white/10 hover:bg-white/20 text-light-text" id="filter-category-Pencahayaan Rumah">Pencahayaan Rumah</button>
+                    </div>
+                </div>
+                
+                <div>
+                    <p class="font-medium mb-2 text-primary-gold">Warna Aksen:</p>
+                    <div class="space-y-2">
+                        <button onclick="handleFilterChange('color', 'Semua')" class="w-full text-left px-4 py-2 text-sm rounded-lg transition duration-200 bg-primary-gold text-dark-bg font-bold" id="filter-color-Semua">Semua</button>
+                        <button onclick="handleFilterChange('color', 'Emas')" class="w-full text-left px-4 py-2 text-sm rounded-lg transition duration-200 bg-white/10 hover:bg-white/20 text-light-text" id="filter-color-Emas">Emas</button>
+                        <button onclick="handleFilterChange('color', 'Hitam')" class="w-full text-left px-4 py-2 text-sm rounded-lg transition duration-200 bg-white/10 hover:bg-white/20 text-light-text" id="filter-color-Hitam">Hitam</button>
+                        <button onclick="handleFilterChange('color', 'Perak')" class="w-full text-left px-4 py-2 text-sm rounded-lg transition duration-200 bg-white/10 hover:bg-white/20 text-light-text" id="filter-color-Perak">Perak</button>
+                        <button onclick="handleFilterChange('color', 'Putih')" class="w-full text-left px-4 py-2 text-sm rounded-lg transition duration-200 bg-white/10 hover:bg-white/20 text-light-text" id="filter-color-Putih">Putih</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Grid (Right Section) -->
+            <div class="md:w-3/4 lg:w-4/5">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8" id="product-grid">
+                    <!-- Products will be inserted by JavaScript -->
+                </div>
+                
+                <div class="hidden text-center col-span-full text-xl text-gray-500 py-12" id="no-products-message">
+                    Produk tidak ditemukan untuk filter ini.
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark-bg border-t border-white/10 mt-12 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-500 text-sm">
+            <p>&copy; 2024 Luvyn. Pencahayaan adalah Ekspresi Diri Anda.</p>
+            <p class="mt-2">Dirancang dengan Elegan. Dibuat dengan Hati.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="../shared.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            renderShopPage();
+        });
+
+        function handleFilterChange(type, value) {
+            appState.filters[type] = value;
+            
+            // Update active filter buttons
+            document.querySelectorAll(`[id^="filter-${type}-"]`).forEach(btn => {
+                btn.classList.remove('bg-primary-gold', 'text-dark-bg', 'font-bold');
+                btn.classList.add('bg-white/10', 'hover:bg-white/20', 'text-light-text');
+            });
+            
+            const activeBtn = document.getElementById(`filter-${type}-${value}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('bg-white/10', 'hover:bg-white/20', 'text-light-text');
+                activeBtn.classList.add('bg-primary-gold', 'text-dark-bg', 'font-bold');
+            }
+            
+            renderShopPage();
+        }
+    </script>
+</body>
+</html>

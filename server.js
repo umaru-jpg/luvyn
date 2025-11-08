@@ -238,9 +238,9 @@ app.post('/api/login', [
   }
 });
 
-// Rute dasar
+// Rute untuk halaman utama
 app.get('/', (req, res) => {
-  res.send('Server Luvyn E-commerce berjalan');
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Jalankan server
