@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riwayat Pesanan - Luvyn</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+        }
+
+        .order-section {
+            margin-top: 20px;
+        }
+
+        .order-item {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .order-header {
+            background-color: #f9f9f9;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .order-id {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .order-date {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .order-status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-confirmed {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+
+        .status-processing {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-shipped {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+
+        .status-delivered {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-cancelled {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .order-details {
+            padding: 15px;
+        }
+
+        .order-products {
+            margin: 15px 0;
+        }
+
+        .product-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .product-item:last-child {
+            border-bottom: none;
+        }
+
+        .product-info {
+            flex: 1;
+        }
+
+        .product-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .product-quantity {
+            color: #666;
+        }
+
+        .product-price {
+            font-weight: bold;
+        }
+
+        .order-total {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: right;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .loading, .no-orders {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .loading {
+            display: none;
+        }
+
+        .btn-back {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .btn-back:hover {
+            background-color: #0056b3;
+        }
+
+        .error-message {
+            color: #dc3545;
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Riwayat Pesanan</h1>
+            <p>Lihat status dan detail pesanan Anda</p>
+        </div>
+
+        <a href="index.html" class="btn-back">← Kembali ke Toko</a>
+
+        <div class="loading" id="loading">
+            <p>Memuat pesanan Anda...</p>
+        </div>
+
+        <div class="no-orders" id="noOrders" style="display: none;">
+            <p>Anda belum memiliki pesanan.</p>
+        </div>
+
+        <div class="error-message" id="errorMessage" style="display: none;">
+            <!-- Error messages will appear here -->
+        </div>
+
+        <div class="order-section" id="orderSection">
+            <!-- Orders will be loaded here dynamically -->
+        </div>
+    </div>
+
+    <script>
+        // Check if user is logged in
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('Anda harus login terlebih dahulu');
+            window.location.href = 'login.html';
+            return;
+        }
+
+        // Fetch user orders from the API
+        async function loadUserOrders() {
+            const loadingElement = document.getElementById('loading');
+            const noOrdersElement = document.getElementById('noOrders');
+            const orderSection = document.getElementById('orderSection');
+            const errorMessage = document.getElementById('errorMessage');
+
+            loadingElement.style.display = 'block';
+            noOrdersElement.style.display = 'none';
+            errorMessage.style.display = 'none';
+            orderSection.innerHTML = '';
+
+            try {
+                const response = await fetch('/api/orders', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error(data.message || 'Gagal mengambil pesanan');
+                }
+
+                const orders = data.orders;
+
+                loadingElement.style.display = 'none';
+
+                if (orders.length === 0) {
+                    noOrdersElement.style.display = 'block';
+                    return;
+                }
+
+                orders.forEach(order => {
+                    const orderElement = document.createElement('div');
+                    orderElement.className = 'order-item';
+                    
+                    // Format status with appropriate class
+                    let statusClass = '';
+                    switch(order.status) {
+                        case 'pending':
+                            statusClass = 'status-pending';
+                            break;
+                        case 'confirmed':
+                            statusClass = 'status-confirmed';
+                            break;
+                        case 'processing':
+                            statusClass = 'status-processing';
+                            break;
+                        case 'shipped':
+                            statusClass = 'status-shipped';
+                            break;
+                        case 'delivered':
+                            statusClass = 'status-delivered';
+                            break;
+                        case 'cancelled':
+                            statusClass = 'status-cancelled';
+                            break;
+                        default:
+                            statusClass = 'status-pending';
+                    }
+                    
+                    // Format date
+                    const orderDate = new Date(order.createdAt).toLocaleDateString('id-ID', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    
+                    // Calculate total price for each product
+                    const orderProductsHtml = order.products.map(product => `
+                        <div class="product-item">
+                            <div class="product-info">
+                                <div class="product-name">${product.name}</div>
+                                <div class="product-quantity">Qty: ${product.quantity}</div>
+                            </div>
+                            <div class="product-price">Rp ${(product.price * product.quantity).toLocaleString('id-ID')}</div>
+                        </div>
+                    `).join('');
+                    
+                    orderElement.innerHTML = `
+                        <div class="order-header">
+                            <div>
+                                <span class="order-id">Pesanan #${order._id.substring(0, 8)}</span>
+                                <div class="order-date">${orderDate}</div>
+                            </div>
+                            <span class="order-status ${statusClass}">${getStatusText(order.status)}</span>
+                        </div>
+                        <div class="order-details">
+                            <div class="order-products">
+                                ${orderProductsHtml}
+                            </div>
+                            <div class="order-total">Total: Rp ${order.totalAmount.toLocaleString('id-ID')}</div>
+                        </div>
+                    `;
+                    
+                    orderSection.appendChild(orderElement);
+                });
+            } catch (error) {
+                console.error('Error loading orders:', error);
+                loadingElement.style.display = 'none';
+                errorMessage.style.display = 'block';
+                errorMessage.textContent = 'Terjadi kesalahan saat mengambil pesanan: ' + error.message;
+            }
+        }
+
+        // Helper function to get status text in Indonesian
+        function getStatusText(status) {
+            switch(status) {
+                case 'pending': return 'Tertunda';
+                case 'confirmed': return 'Dikonfirmasi';
+                case 'processing': return 'Diproses';
+                case 'shipped': return 'Dikirim';
+                case 'delivered': return 'Diterima';
+                case 'cancelled': return 'Dibatalkan';
+                default: return status;
+            }
+        }
+
+        // Load orders when the page loads
+        document.addEventListener('DOMContentLoaded', loadUserOrders);
+    </script>
+</body>
+</html>

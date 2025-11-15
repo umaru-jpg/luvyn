@@ -8,37 +8,95 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Load SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- Konfigurasi Tailwind untuk tema Emas (Yellow-400) dan Hitam -->
+    <!-- Load Poppins font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Konfigurasi Tailwind untuk tema Emas (FFD700) dan Hitam -->
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        'primary-gold': '#FACC15', // Tailwind yellow-400
+                        'primary-gold': '#FFD700',  // Emas asli
                         'dark-bg': '#000000',
-                        'light-text': '#E5E7EB', // Slightly off-white for better readability on black
+                        'light-text': '#FFFFFF',   // White teks
+                        'gray-bg': '#111111',       // Abu-abu gelap
+                        'border-light': '#333333',  // Border abu-abu terang
                     },
                     fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
+                        sans: ['Poppins', 'sans-serif'],
                     },
                 }
             }
         }
     </script>
     <style>
-        /* Menggunakan font Inter dari Google Fonts */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
 
-        /* Efek cahaya/glow minimalis untuk elemen penting */
+        /* Efek cahaya/glow untuk elemen penting */
         .glow-text {
-            text-shadow: 0 0 5px rgba(255, 255, 255, 0.4);
+            text-shadow: 0 0 5px rgba(255, 215, 0, 0.4);
         }
         .glow-border {
-            box-shadow: 0 0 10px rgba(250, 202, 21, 0.5); /* Sinar Emas */
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
         }
-        .product-card:hover .glow-effect {
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
-            transform: translateY(-5px);
+        .card-shadow {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1),
+                        0 1px 3px rgba(255, 215, 0, 0.1);
+        }
+        .button-shadow {
+            box-shadow: 0 4px 8px rgba(255, 215, 0, 0.2);
+        }
+
+        /* Progress Bar Styles */
+        .progress-bar {
+            height: 4px;
+            background: #333;
+            position: relative;
+            border-radius: 2px;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: #FFD700;
+            width: 50%; /* Step 1: Shipping */
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+        .progress-step {
+            position: absolute;
+            top: -30px;
+            transform: translateX(-50%);
+            font-size: 14px;
+            color: #666;
+            text-align: center;
+            width: 100px;
+        }
+        .progress-step.active {
+            color: #FFD700;
+            font-weight: 600;
+        }
+        .progress-step.completed {
+            color: #FFD700;
+        }
+        .progress-step-dot {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #333;
+            z-index: 2;
+        }
+        .progress-step-dot.active {
+            background: #FFD700;
+        }
+        .progress-step-dot.completed {
+            background: #FFD700;
         }
     </style>
 </head>
@@ -47,7 +105,7 @@
     <!-- Header & Navigation -->
     <header class="sticky top-0 z-50 bg-dark-bg bg-opacity-95 backdrop-blur-sm shadow-md">
         <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-            <a href="./index.html" class="text-3xl font-bold text-primary-gold glow-text tracking-widest">Luvyn</a>
+            <a href="./index.html"><img src="/images/logo/logo.jpeg" alt="Luvyn Logo" class="h-12 object-contain"></a>
             <div class="hidden md:flex space-x-8 items-center text-lg">
                 <a href="./index.html" class="hover:text-primary-gold transition duration-200">Home</a>
                 <a href="./shop.html" class="hover:text-primary-gold transition duration-200">Koleksi</a>
@@ -59,135 +117,198 @@
                     <svg class="w-6 h-6 text-light-text" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                     <span id="cart-count" class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-black transform translate-x-1/2 -translate-y-1/2 bg-primary-gold rounded-full">0</span>
                 </a>
-                <button id="mobile-menu-button" class="md:hidden p-2 rounded-full hover:bg-white/10 transition duration-200">
-                    <svg class="w-6 h-6 text-light-text" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-                </button>
             </div>
         </nav>
     </header>
 
+    <!-- Progress Bar -->
+    <div class="bg-dark-bg py-6 border-b border-border-light">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="relative">
+                <div class="progress-bar">
+                    <div class="progress-bar-fill"></div>
+                </div>
+
+                <!-- Shipping Step -->
+                <div class="progress-step left-0 active" style="left: 0%;">
+                    <div class="progress-step-dot active"></div>
+                    Pengiriman
+                </div>
+
+                <!-- Payment Step -->
+                <div class="progress-step left-1/2" style="left: 100%;">
+                    <div class="progress-step-dot"></div>
+                    Pembayaran
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Main Content -->
-    <main class="flex-grow max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 w-full">
-        <h2 class="text-4xl font-extrabold text-primary-gold mb-8 border-b border-white/10 pb-4">Checkout</h2>
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 w-full">
+        <h2 class="text-3xl font-bold text-primary-gold mb-8">Checkout</h2>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- Formulir Alamat & Pembayaran -->
-            <div class="bg-white/5 p-6 rounded-xl border border-white/10">
-                <h3 class="text-2xl font-bold mb-6 text-light-text">Detail Pemesanan</h3>
-                
-                <form id="checkout-form">
-                    <div class="space-y-4">
+            <!-- Bagian Kiri (Formulir Pengiriman) -->
+            <div class="space-y-8">
+                <!-- Form data pribadi -->
+                <div class="bg-gray-bg p-6 rounded-xl border border-border-light card-shadow">
+                    <h3 class="text-xl font-bold mb-6 text-light-text">Data Pribadi</h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-light-text mb-2" for="name">Nama Lengkap</label>
-                            <input type="text" id="name" class="w-full p-3 rounded-lg bg-dark-bg border border-white/20 text-light-text focus:outline-none focus:ring-2 focus:ring-primary-gold" placeholder="Masukkan nama lengkap Anda">
+                            <label class="block text-light-text mb-2" for="first-name">Nama Depan</label>
+                            <input type="text" id="first-name" class="w-full p-3 rounded-lg bg-dark-bg border border-border-light text-light-text focus:outline-none focus:ring-2 focus:ring-primary-gold" placeholder="Nama Depan">
                         </div>
-                        
+
                         <div>
-                            <label class="block text-light-text mb-2" for="phone">Nomor Telepon</label>
-                            <input type="tel" id="phone" class="w-full p-3 rounded-lg bg-dark-bg border border-white/20 text-light-text focus:outline-none focus:ring-2 focus:ring-primary-gold" placeholder="Masukkan nomor telepon Anda">
-                        </div>
-                        
-                        <div>
-                            <label class="block text-light-text mb-2" for="address">Alamat Lengkap</label>
-                            <textarea id="address" rows="4" class="w-full p-3 rounded-lg bg-dark-bg border border-white/20 text-light-text focus:outline-none focus:ring-2 focus:ring-primary-gold" placeholder="Masukkan alamat lengkap Anda"></textarea>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-light-text mb-2">Metode Pembayaran</label>
-                            <div class="space-y-3">
-                                <div class="flex items-center">
-                                    <input type="radio" id="dana" name="payment" value="DANA" class="h-4 w-4 text-primary-gold focus:ring-primary-gold" checked>
-                                    <label for="dana" class="ml-2 text-light-text">DANA</label>
-                                </div>
-                                <div class="flex items-center">
-                                    <input type="radio" id="gopay" name="payment" value="GoPay" class="h-4 w-4 text-primary-gold focus:ring-primary-gold">
-                                    <label for="gopay" class="ml-2 text-light-text">GoPay</label>
-                                </div>
-                                <div class="flex items-center">
-                                    <input type="radio" id="ovo" name="payment" value="OVO" class="h-4 w-4 text-primary-gold focus:ring-primary-gold">
-                                    <label for="ovo" class="ml-2 text-light-text">OVO</label>
-                                </div>
-                                <div class="flex items-center">
-                                    <input type="radio" id="shopeepay" name="payment" value="ShopeePay" class="h-4 w-4 text-primary-gold focus:ring-primary-gold">
-                                    <label for="shopeepay" class="ml-2 text-light-text">ShopeePay</label>
-                                </div>
-                            </div>
+                            <label class="block text-light-text mb-2" for="last-name">Nama Belakang</label>
+                            <input type="text" id="last-name" class="w-full p-3 rounded-lg bg-dark-bg border border-border-light text-light-text focus:outline-none focus:ring-2 focus:ring-primary-gold" placeholder="Nama Belakang">
                         </div>
                     </div>
-                </form>
+
+                    <div class="mt-4">
+                        <label class="block text-light-text mb-2" for="email">Alamat Email</label>
+                        <input type="email" id="email" class="w-full p-3 rounded-lg bg-dark-bg border border-border-light text-light-text focus:outline-none focus:ring-2 focus:ring-primary-gold" placeholder="email@contoh.com">
+                        <p class="text-sm text-gray-400 mt-2">Konfirmasi pesanan akan dikirimkan ke alamat email ini.</p>
+                    </div>
+
+                    <div class="mt-4">
+                        <label class="block text-light-text mb-2" for="phone">Nomor Telepon</label>
+                        <input type="tel" id="phone" class="w-full p-3 rounded-lg bg-dark-bg border border-border-light text-light-text focus:outline-none focus:ring-2 focus:ring-primary-gold" placeholder="0812 3456 7890">
+                    </div>
+                </div>
+
+                <!-- Form alamat pengiriman -->
+                <div class="bg-gray-bg p-6 rounded-xl border border-border-light card-shadow">
+                    <h3 class="text-xl font-bold mb-6 text-light-text">Alamat Pengiriman</h3>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-light-text mb-2" for="address">Alamat Lengkap</label>
+                            <textarea id="address" rows="3" class="w-full p-3 rounded-lg bg-dark-bg border border-border-light text-light-text focus:outline-none focus:ring-2 focus:ring-primary-gold" placeholder="Contoh: Jl. Raya Kedung Baruk No. 21, Surabaya"></textarea>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-light-text mb-2" for="country">Negara</label>
+                                <select id="country" class="w-full p-3 rounded-lg bg-dark-bg border border-border-light text-light-text focus:outline-none focus:ring-2 focus:ring-primary-gold">
+                                    <option value="">Pilih Negara</option>
+                                    <option value="Indonesia" selected>Indonesia</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-light-text mb-2" for="province">Provinsi</label>
+                                <select id="province" class="w-full p-3 rounded-lg bg-dark-bg border border-border-light text-light-text focus:outline-none focus:ring-2 focus:ring-primary-gold">
+                                    <option value="">Pilih Provinsi</option>
+                                    <option value="Aceh">Aceh</option>
+                                    <option value="Bali">Bali</option>
+                                    <option value="Banten">Banten</option>
+                                    <option value="Bengkulu">Bengkulu</option>
+                                    <option value="DI Yogyakarta">DI Yogyakarta</option>
+                                    <option value="DKI Jakarta">DKI Jakarta</option>
+                                    <option value="Gorontalo">Gorontalo</option>
+                                    <option value="Jambi">Jambi</option>
+                                    <option value="Jawa Barat">Jawa Barat</option>
+                                    <option value="Jawa Tengah">Jawa Tengah</option>
+                                    <option value="Jawa Timur">Jawa Timur</option>
+                                    <option value="Kalimantan Barat">Kalimantan Barat</option>
+                                    <option value="Kalimantan Selatan">Kalimantan Selatan</option>
+                                    <option value="Kalimantan Tengah">Kalimantan Tengah</option>
+                                    <option value="Kalimantan Timur">Kalimantan Timur</option>
+                                    <option value="Kalimantan Utara">Kalimantan Utara</option>
+                                    <option value="Kepulauan Bangka Belitung">Kepulauan Bangka Belitung</option>
+                                    <option value="Kepulauan Riau">Kepulauan Riau</option>
+                                    <option value="Lampung">Lampung</option>
+                                    <option value="Maluku">Maluku</option>
+                                    <option value="Maluku Utara">Maluku Utara</option>
+                                    <option value="Nusa Tenggara Barat">Nusa Tenggara Barat</option>
+                                    <option value="Nusa Tenggara Timur">Nusa Tenggara Timur</option>
+                                    <option value="Papua">Papua</option>
+                                    <option value="Papua Barat">Papua Barat</option>
+                                    <option value="Riau">Riau</option>
+                                    <option value="Sulawesi Barat">Sulawesi Barat</option>
+                                    <option value="Sulawesi Selatan">Sulawesi Selatan</option>
+                                    <option value="Sulawesi Tengah">Sulawesi Tengah</option>
+                                    <option value="Sulawesi Tenggara">Sulawesi Tenggara</option>
+                                    <option value="Sulawesi Utara">Sulawesi Utara</option>
+                                    <option value="Sumatera Barat">Sumatera Barat</option>
+                                    <option value="Sumatera Selatan">Sumatera Selatan</option>
+                                    <option value="Sumatera Utara">Sumatera Utara</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-light-text mb-2" for="city">Kota</label>
+                                <input type="text" id="city" class="w-full p-3 rounded-lg bg-dark-bg border border-border-light text-light-text focus:outline-none focus:ring-2 focus:ring-primary-gold" placeholder="Kota">
+                            </div>
+
+                            <div>
+                                <label class="block text-light-text mb-2" for="subdistrict">Kecamatan</label>
+                                <input type="text" id="subdistrict" class="w-full p-3 rounded-lg bg-dark-bg border border-border-light text-light-text focus:outline-none focus:ring-2 focus:ring-primary-gold" placeholder="Kecamatan">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-light-text mb-2" for="postal-code">Kode Pos</label>
+                            <input type="text" id="postal-code" class="w-full p-3 rounded-lg bg-dark-bg border border-border-light text-light-text focus:outline-none focus:ring-2 focus:ring-primary-gold" placeholder="60221">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pilihan metode pengiriman -->
+                <div class="bg-gray-bg p-6 rounded-xl border border-border-light card-shadow">
+                    <h3 class="text-xl font-bold mb-6 text-light-text">Metode Pengiriman</h3>
+
+                    <div class="space-y-3">
+                        <label class="flex items-start p-4 border border-border-light rounded-lg cursor-pointer hover:bg-dark-bg/30 transition">
+                            <input type="radio" name="shipping" value="home" class="mt-1 mr-3 text-primary-gold focus:ring-primary-gold" checked>
+                            <div class="flex-1">
+                                <div class="flex items-center">
+                                    <svg class="w-5 h-5 text-primary-gold mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                                    </svg>
+                                    <span class="text-lg font-medium text-light-text">Pengiriman ke Rumah</span>
+                                </div>
+                                <p class="text-gray-400 text-sm ml-7">3–5 hari kerja</p>
+                            </div>
+                            <div class="text-primary-gold font-bold">Gratis</div>
+                        </label>
+
+                        <label class="flex items-start p-4 border border-border-light rounded-lg cursor-pointer hover:bg-dark-bg/30 transition">
+                            <input type="radio" name="shipping" value="store" class="mt-1 mr-3 text-primary-gold focus:ring-primary-gold">
+                            <div class="flex-1">
+                                <div class="flex items-center">
+                                    <svg class="w-5 h-5 text-primary-gold mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                    </svg>
+                                    <span class="text-lg font-medium text-light-text">Ambil di Toko</span>
+                                </div>
+                                <p class="text-gray-400 text-sm ml-7">Gratis, siap dalam 1 jam</p>
+                            </div>
+                            <div class="text-primary-gold font-bold">Gratis</div>
+                        </label>
+                    </div>
+                </div>
             </div>
 
-            <!-- Ringkasan Pesanan -->
-            <div class="bg-white/5 p-6 rounded-xl border border-white/10" id="order-summary">
+            <!-- Bagian Kanan (Ringkasan Pesanan) -->
+            <div class="bg-gray-bg p-6 rounded-xl border border-border-light card-shadow h-fit" id="order-summary">
                 <!-- Ringkasan pesanan akan diisi oleh JavaScript -->
             </div>
         </div>
     </main>
 
     <!-- Footer -->
-    <footer class="bg-dark-bg border-t border-white/10 mt-12 py-8">
+    <footer class="bg-dark-bg border-t border-border-light mt-12 py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-500 text-sm">
             <p>&copy; 2024 Luvyn. Pencahayaan adalah Ekspresi Diri Anda.</p>
             <p class="mt-2">Dirancang dengan Elegan. Dibuat dengan Hati.</p>
         </div>
     </footer>
-
-    <!-- Modal QR Code -->
-    <div id="qr-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
-        <div class="bg-dark-bg rounded-xl border border-white/10 max-w-2xl w-11/12 max-h-[95vh] overflow-y-auto p-10 relative">
-            <h3 class="text-3xl font-bold text-light-text mb-8 text-center">Pembayaran DANA</h3>
-            
-            <div class="flex justify-center mb-8">
-                <!-- Placeholder untuk QR Code -->
-                <div class="bg-white p-8 rounded-xl">
-                    <div class="bg-gray-200 border-2 border-dashed rounded-xl w-80 h-80 flex items-center justify-center text-gray-500">
-                        QR CODE
-                    </div>
-                </div>
-            </div>
-            
-            <p class="text-center text-2xl text-light-text mb-6">Total Pembayaran: <span id="total-amount" class="text-primary-gold font-bold"></span></p>
-            <p class="text-center text-gray-400 text-xl mb-10">Silakan scan QR code di atas untuk menyelesaikan pembayaran</p>
-            
-            <div class="flex justify-center gap-6">
-                <button id="confirm-payment" class="flex-1 bg-primary-gold text-dark-bg py-4 px-6 rounded-lg font-bold hover:bg-yellow-300 transition duration-300 text-xl">
-                    Saya Telah Membayar
-                </button>
-                
-                <button id="close-qr-modal" class="p-4 text-gray-400 hover:text-light-text bg-white/10 rounded-lg self-start">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Terima Kasih -->
-    <div id="thank-you-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
-        <div class="bg-dark-bg rounded-xl border border-white/10 max-w-2xl w-11/12 max-h-[95vh] overflow-y-auto p-10 relative">
-            <div class="text-center">
-                <div class="w-24 h-24 bg-primary-gold rounded-full flex items-center justify-center mx-auto mb-8">
-                    <svg class="w-12 h-12 text-dark-bg" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                </div>
-                
-                <h3 class="text-4xl font-bold text-light-text mb-6">Terima Kasih!</h3>
-                <p class="text-gray-400 text-2xl mb-8">Pesanan Anda telah berhasil diproses.</p>
-                
-                <div id="order-details" class="text-left bg-white/5 p-8 rounded-xl mb-10 text-lg">
-                    <!-- Detail pesanan akan diisi oleh JavaScript -->
-                </div>
-                
-                <div class="flex justify-center gap-6">
-                    <button id="close-thank-you-modal" class="flex-1 bg-primary-gold text-dark-bg py-4 px-6 rounded-lg font-bold hover:bg-yellow-300 transition duration-300 text-xl">
-                        Tutup
-                    </button>
-                    
-                    <button id="close-thank-you-modal-alt" class="p-4 text-gray-400 hover:text-light-text bg-white/10 rounded-lg self-start">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- JavaScript -->
     <script src="../shared.js"></script>
@@ -195,56 +316,54 @@
         document.addEventListener('DOMContentLoaded', function() {
             updateCartCount();
             renderOrderSummary();
-            
-            // Set event listeners untuk modal
-            document.getElementById('confirm-payment').addEventListener('click', function() {
-                document.getElementById('qr-modal').classList.add('hidden');
-                document.getElementById('thank-you-modal').classList.remove('hidden');
-                showOrderDetails();
-                // Kosongkan keranjang setelah pembayaran
-                appState.cart = [];
-                saveCartToLocalStorage();
-                updateCartCount();
-            });
-            
-            document.getElementById('close-qr-modal').addEventListener('click', function() {
-                document.getElementById('qr-modal').classList.add('hidden');
-            });
-            
-            document.getElementById('close-thank-you-modal').addEventListener('click', function() {
-                document.getElementById('thank-you-modal').classList.add('hidden');
-                // Redirect ke halaman utama setelah menutup modal
-                window.location.href = './index.html';
-            });
-            
-            document.getElementById('close-thank-you-modal-alt').addEventListener('click', function() {
-                document.getElementById('thank-you-modal').classList.add('hidden');
-                // Redirect ke halaman utama setelah menutup modal
-                window.location.href = './index.html';
-            });
         });
 
         function renderOrderSummary() {
+            if (appState.cart.length === 0) {
+                document.getElementById('order-summary').innerHTML = `
+                    <h3 class="text-2xl font-bold mb-6 text-light-text border-b border-border-light pb-3">Ringkasan Pesanan</h3>
+                    <div class="text-center py-10">
+                        <p class="text-gray-400">Belum ada produk dalam checkout.</p>
+                    </div>
+                `;
+                return;
+            }
+
             const subtotal = appState.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            const shipping = 50000; // Contoh biaya pengiriman
+            // Determine shipping cost based on selected option
+            const selectedShippingValue = document.querySelector('input[name="shipping"]:checked') ?
+                document.querySelector('input[name="shipping"]:checked').value : 'free'; // Default to free
+
+            let shipping = 0; // Default shipping cost
+            if (selectedShippingValue === 'home') {
+                shipping = 0; // Gratis pengiriman ke rumah
+            } else if (selectedShippingValue === 'store') {
+                shipping = 0; // Free for store pickup
+            } else if (selectedShippingValue === 'free') {
+                shipping = 0; // Free shipping
+            }
+
             const total = subtotal + shipping;
 
             const orderSummaryHtml = `
-                <h3 class="text-2xl font-bold mb-6 text-light-text border-b border-white/10 pb-3">Ringkasan Pesanan</h3>
-                
-                <div class="space-y-4 mb-6">
+                <h3 class="text-2xl font-bold mb-6 text-light-text border-b border-border-light pb-3">Ringkasan Pesanan</h3>
+
+                <div class="space-y-4 mb-6 max-h-96 overflow-y-auto pr-2">
                     ${appState.cart.map(item => `
-                        <div class="flex justify-between items-center border-b border-white/10 pb-3">
-                            <div>
-                                <p class="font-medium text-light-text">${item.name}</p>
-                                <p class="text-sm text-gray-400">Qty: ${item.quantity}</p>
+                        <div class="flex items-center border-b border-border-light pb-4">
+                            <div class="w-16 h-16 overflow-hidden rounded-md flex-shrink-0 mr-4">
+                                <img src="${item.imageUrl}" alt="${item.name}" class="w-full h-full object-cover">
                             </div>
-                            <p class="font-bold text-light-text">${formatRupiah(item.price * item.quantity)}</p>
+                            <div class="flex-1">
+                                <h4 class="font-medium text-light-text">${item.name}</h4>
+                                <p class="text-sm text-gray-400">Qty: ${item.quantity}</p>
+                                <p class="text-primary-gold font-bold mt-1">${formatRupiah(item.price * item.quantity)}</p>
+                            </div>
                         </div>
                     `).join('')}
                 </div>
-                
-                <div class="space-y-3 text-lg border-t border-white/10 pt-4">
+
+                <div class="space-y-3 text-lg border-t border-border-light pt-4">
                     <div class="flex justify-between">
                         <span>Subtotal:</span>
                         <span>${formatRupiah(subtotal)}</span>
@@ -258,68 +377,165 @@
                         <span>${formatRupiah(total)}</span>
                     </div>
                 </div>
-                
-                <button id="place-order-btn" class="mt-8 w-full bg-primary-gold text-dark-bg text-lg font-bold py-3 rounded-full hover:bg-yellow-300 transition duration-300">
-                    Buat Pesanan
+
+                <button id="continue-to-payment" class="mt-8 w-full bg-primary-gold text-dark-bg font-bold py-4 rounded-lg hover:bg-yellow-600 transition duration-300 text-lg button-shadow">
+                    Lanjutkan ke Pembayaran
                 </button>
+
+                <!-- WhatsApp Checkout Option -->
+                <div class="mt-4">
+                    <p class="text-center text-gray-400 text-sm mb-2">atau</p>
+                    <a href="#" id="whatsapp-checkout" class="w-full flex items-center justify-center bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg transition duration-300 text-lg button-shadow">
+                        <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                        </svg>
+                        Pesan via WhatsApp
+                    </a>
+                </div>
             `;
 
             document.getElementById('order-summary').innerHTML = orderSummaryHtml;
-            
-            // Set event listener untuk tombol buat pesanan
-            document.getElementById('place-order-btn').addEventListener('click', function() {
-                if(validateForm()) {
-                    const total = (appState.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0) + 50000);
-                    document.getElementById('total-amount').textContent = formatRupiah(total);
-                    document.getElementById('qr-modal').classList.remove('hidden');
+
+            // Set event listener untuk tombol lanjut ke pembayaran
+            document.getElementById('continue-to-payment').addEventListener('click', function() {
+                if(validateShippingForm()) {
+                    // Simpan data pengiriman ke session storage
+                    const shippingData = {
+                        firstName: document.getElementById('first-name').value,
+                        lastName: document.getElementById('last-name').value,
+                        email: document.getElementById('email').value,
+                        phone: document.getElementById('phone').value,
+                        address: document.getElementById('address').value,
+                        country: document.getElementById('country').value,
+                        province: document.getElementById('province').value,
+                        city: document.getElementById('city').value,
+                        subdistrict: document.getElementById('subdistrict').value,
+                        postalCode: document.getElementById('postal-code').value,
+                        shippingMethod: document.querySelector('input[name="shipping"]:checked').value
+                    };
+                    sessionStorage.setItem('shippingData', JSON.stringify(shippingData));
+
+                    // Redirect ke halaman pembayaran
+                    window.location.href = 'payment.html';
                 }
+            });
+
+            // Add event listeners for shipping options to update shipping cost in real-time
+            const shippingOptions = document.querySelectorAll('input[name="shipping"]');
+            shippingOptions.forEach(option => {
+                option.addEventListener('change', renderOrderSummary);
+            });
+
+            // WhatsApp checkout functionality
+            document.getElementById('whatsapp-checkout').addEventListener('click', function(e) {
+                e.preventDefault();
+
+                if (!validateShippingForm()) {
+                    return;
+                }
+
+                // Get order details
+                const subtotal = appState.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                let shipping = 0; // Default shipping cost
+                const selectedShippingValue = document.querySelector('input[name="shipping"]:checked') ?
+                    document.querySelector('input[name="shipping"]:checked').value : 'home';
+
+                if (selectedShippingValue === 'home') {
+                    shipping = 0; // Gratis pengiriman ke rumah
+                } else if (selectedShippingValue === 'store') {
+                    shipping = 0; // Free for store pickup
+                } else if (selectedShippingValue === 'free') {
+                    shipping = 0; // Free shipping
+                }
+
+                const total = subtotal + shipping;
+
+                // Get customer information
+                const firstName = document.getElementById('first-name').value;
+                const lastName = document.getElementById('last-name').value;
+                const email = document.getElementById('email').value;
+                const phone = document.getElementById('phone').value;
+                const address = document.getElementById('address').value;
+                const city = document.getElementById('city').value;
+                const province = document.getElementById('province').value;
+                const postalCode = document.getElementById('postal-code').value;
+
+                // Format order details for WhatsApp message
+                let message = "*ORDER VIA WHATSAPP*%0A%0A";
+                message += "*Data Pribadi:*%0A";
+                message += "Nama: " + firstName + " " + lastName + "%0A";
+                message += "Email: " + email + "%0A";
+                message += "Telepon: " + phone + "%0A%0A";
+
+                message += "*Alamat Pengiriman:*%0A";
+                message += "Alamat: " + address + "%0A";
+                message += "Kota: " + city + "%0A";
+                message += "Provinsi: " + province + "%0A";
+                message += "Kode Pos: " + postalCode + "%0A%0A";
+
+                message += "*Metode Pengiriman:*%0A";
+                message += "Pilihan: " + (selectedShippingValue === 'home' ? 'Pengiriman ke Rumah' : 'Ambil di Toko') + "%0A%0A";
+
+                message += "*Detail Pesanan:*%0A";
+                appState.cart.forEach(item => {
+                    message += "- " + item.name + " (Qty: " + item.quantity + ") = " + formatRupiah(item.price * item.quantity) + "%0A";
+                });
+
+                message += "%0A*Ringkasan:*%0A";
+                message += "Subtotal: " + formatRupiah(subtotal) + "%0A";
+                message += "Biaya Pengiriman: " + formatRupiah(shipping) + "%0A";
+                message += "*Total: " + formatRupiah(total) + "*";
+
+                // TODO: Replace with your actual WhatsApp number (without + and with country code, e.g. 6281234567890 for Indonesia)
+                const whatsappNumber = "6281548927155"; // Update this with your WhatsApp number (format: countrycode + number, without + or 0)
+                const whatsappUrl = "https://wa.me/" + whatsappNumber + "?text=" + encodeURIComponent(message);
+
+                // Open WhatsApp with pre-filled message
+                window.open(whatsappUrl, '_blank');
             });
         }
 
-        function validateForm() {
-            const name = document.getElementById('name').value.trim();
+        function validateShippingForm() {
+            const firstName = document.getElementById('first-name').value.trim();
+            const lastName = document.getElementById('last-name').value.trim();
+            const email = document.getElementById('email').value.trim();
             const phone = document.getElementById('phone').value.trim();
             const address = document.getElementById('address').value.trim();
-            
-            if (!name || !phone || !address) {
+            const country = document.getElementById('country').value;
+            const province = document.getElementById('province').value;
+            const city = document.getElementById('city').value;
+            const subdistrict = document.getElementById('subdistrict').value.trim();
+            const postalCode = document.getElementById('postal-code').value.trim();
+
+            if (!firstName || !lastName || !email || !phone || !address || !country || !province || !city || !subdistrict || !postalCode) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Oops...',
-                    text: 'Mohon lengkapi semua data pemesanan',
+                    text: 'Mohon lengkapi semua data pengiriman',
                     background: '#000000',
-                    color: '#E5E7EB',
+                    color: '#FFFFFF',
                     iconColor: '#F87171',
-                    confirmButtonColor: '#FACC15',
+                    confirmButtonColor: '#FFD700',
                 });
                 return false;
             }
-            
+
+            // Validasi email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Format email tidak valid',
+                    background: '#000000',
+                    color: '#FFFFFF',
+                    iconColor: '#F87171',
+                    confirmButtonColor: '#FFD700',
+                });
+                return false;
+            }
+
             return true;
-        }
-
-        function showOrderDetails() {
-            const orderDetails = {
-                name: document.getElementById('name').value,
-                phone: document.getElementById('phone').value,
-                address: document.getElementById('address').value,
-                paymentMethod: document.querySelector('input[name="payment"]:checked').value,
-                items: appState.cart,
-                subtotal: appState.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
-                shipping: 50000,
-                total: appState.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0) + 50000
-            };
-
-            const orderDetailsHtml = `
-                <p><span class="font-semibold">Nama:</span> ${orderDetails.name}</p>
-                <p><span class="font-semibold">Telepon:</span> ${orderDetails.phone}</p>
-                <p><span class="font-semibold">Alamat:</span> ${orderDetails.address}</p>
-                <p><span class="font-semibold">Metode Pembayaran:</span> ${orderDetails.paymentMethod}</p>
-                <p class="mt-2"><span class="font-semibold">Subtotal:</span> ${formatRupiah(orderDetails.subtotal)}</p>
-                <p><span class="font-semibold">Pengiriman:</span> ${formatRupiah(orderDetails.shipping)}</p>
-                <p class="font-bold text-primary-gold"><span class="font-semibold">Total:</span> ${formatRupiah(orderDetails.total)}</p>
-            `;
-
-            document.getElementById('order-details').innerHTML = orderDetailsHtml;
         }
     </script>
 </body>

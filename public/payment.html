@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pembayaran - Luvyn</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Load Poppins font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Konfigurasi Tailwind untuk tema Emas (FFD700) dan Hitam -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-gold': '#FFD700',  // Emas asli
+                        'dark-bg': '#000000',
+                        'light-text': '#FFFFFF',   // White teks
+                        'gray-bg': '#111111',       // Abu-abu gelap
+                        'border-light': '#333333',  // Border abu-abu terang
+                        'gray-light': '#222222',    // Abu-abu terang
+                        'danger': '#EF4444',        // Merah untuk peringatan
+                    },
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        /* Efek cahaya/glow untuk elemen penting */
+        .glow-text {
+            text-shadow: 0 0 5px rgba(255, 215, 0, 0.4);
+        }
+        .glow-border {
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+        .card-shadow {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 
+                        0 1px 3px rgba(255, 215, 0, 0.1);
+        }
+        .button-shadow {
+            box-shadow: 0 4px 8px rgba(255, 215, 0, 0.2);
+        }
+        
+        /* Progress Bar Styles */
+        .progress-bar {
+            height: 4px;
+            background: #333;
+            position: relative;
+            border-radius: 2px;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: #FFD700;
+            width: 100%; /* Step 2: Payment */
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+        .progress-step {
+            position: absolute;
+            top: -30px;
+            transform: translateX(-50%);
+            font-size: 14px;
+            color: #666;
+            text-align: center;
+            width: 100px;
+        }
+        .progress-step.active {
+            color: #FFD700;
+            font-weight: 600;
+        }
+        .progress-step.completed {
+            color: #FFD700;
+        }
+        .progress-step-dot {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #333;
+            z-index: 2;
+        }
+        .progress-step-dot.active {
+            background: #FFD700;
+        }
+        .progress-step-dot.completed {
+            background: #FFD700;
+        }
+    </style>
+</head>
+
+<body class="bg-dark-bg text-light-text font-sans antialiased min-h-screen flex flex-col">
+    <!-- Header & Navigation -->
+    <header class="sticky top-0 z-50 bg-dark-bg bg-opacity-95 backdrop-blur-sm shadow-md">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <a href="./index.html"><img src="/images/logo/logo.jpeg" alt="Luvyn Logo" class="h-12 object-contain"></a>
+            <div class="hidden md:flex space-x-8 items-center text-lg">
+                <a href="./index.html" class="hover:text-primary-gold transition duration-200">Home</a>
+                <a href="./shop.html" class="hover:text-primary-gold transition duration-200">Koleksi</a>
+                <a href="./about.html" class="hover:text-primary-gold transition duration-200">Tentang Kami</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <a href="./cart.html" class="relative p-2 rounded-full hover:bg-white/10 transition duration-200">
+                    <!-- Icon Keranjang SVG -->
+                    <svg class="w-6 h-6 text-light-text" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    <span id="cart-count" class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-black transform translate-x-1/2 -translate-y-1/2 bg-primary-gold rounded-full">0</span>
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Progress Bar -->
+    <div class="bg-dark-bg py-6 border-b border-border-light">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="relative">
+                <div class="progress-bar">
+                    <div class="progress-bar-fill"></div>
+                </div>
+                
+                <!-- Shipping Step -->
+                <div class="progress-step left-0 completed" style="left: 0%;">
+                    <div class="progress-step-dot completed"></div>
+                    Pengiriman
+                </div>
+                
+                <!-- Payment Step -->
+                <div class="progress-step left-1/2 active" style="left: 100%;">
+                    <div class="progress-step-dot active"></div>
+                    Pembayaran
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 w-full">
+        <h2 class="text-3xl font-bold text-primary-gold mb-8">Pembayaran</h2>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Bagian Kiri (Utama) -->
+            <div class="space-y-8">
+                
+                
+                <!-- Metode pembayaran -->
+                <div class="bg-gray-bg p-6 rounded-xl border border-border-light card-shadow">
+                    <h3 class="text-xl font-bold mb-6 text-light-text">Metode Pembayaran</h3>
+                    
+                    <div class="space-y-3">
+                        <!-- QRIS Payment Option -->
+                        <label class="flex items-start p-4 border border-border-light rounded-lg cursor-pointer hover:bg-dark-bg/30 transition">
+                            <input type="radio" name="payment" value="qris" class="mt-1 mr-3 text-primary-gold focus:ring-primary-gold" checked>
+                            <div class="flex-1">
+                                <div class="flex items-center">
+                                    <svg class="w-6 h-6 text-primary-gold mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                                    </svg>
+                                    <span class="text-lg font-medium text-light-text">QRIS</span>
+                                </div>
+                                <p class="text-gray-400 text-sm ml-8">Pembayaran dengan QR Code</p>
+                            </div>
+                        </label>
+                        
+                        <!-- QR Code Area (Visible when QRIS is selected) -->
+                        <div id="qris-area" class="mt-4 p-6 bg-gray-light border border-primary-gold rounded-lg">
+                            <div class="flex flex-col items-center">
+                                <h4 class="text-lg font-medium text-light-text mb-4">Scan QR Code untuk Pembayaran</h4>
+                                
+                                <!-- QR Code Image -->
+                                <div class="bg-white p-4 rounded-xl mb-4">
+                                    <img src="/images/qr/qris.jpeg" alt="QRIS Code Pembayaran" class="w-64 h-64 object-contain">
+                                </div>
+                                
+                                <p class="text-center text-gray-400 text-sm">
+                                    Buka aplikasi pembayaran yang mendukung QRIS, 
+                                    lalu arahkan kamera ke QR code di atas
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Kode diskon -->
+                <div class="bg-gray-bg p-6 rounded-xl border border-border-light card-shadow">
+                    <h3 class="text-xl font-bold mb-4 text-light-text">Kode Diskon</h3>
+                    
+                    <div class="flex space-x-2">
+                        <input type="text" id="discount-code" class="flex-1 p-3 rounded-lg bg-dark-bg border border-border-light text-light-text focus:outline-none focus:ring-2 focus:ring-primary-gold" placeholder="Masukkan kode diskon Anda">
+                        <button id="apply-discount" class="bg-gray-light text-light-text px-6 rounded-lg hover:bg-gray-700 transition duration-300 font-medium">
+                            Gunakan
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Syarat & Ketentuan -->
+                <div class="bg-gray-bg p-6 rounded-xl border border-border-light card-shadow">
+                    <div class="flex items-start">
+                        <input type="checkbox" id="terms" class="mt-1 mr-3 text-primary-gold focus:ring-primary-gold">
+                        <label for="terms" class="text-light-text text-sm">
+                            Dengan melanjutkan, saya menyetujui 
+                            <a href="#" class="text-primary-gold hover:underline">Syarat & Ketentuan</a> 
+                            dan 
+                            <a href="#" class="text-primary-gold hover:underline">Kebijakan Privasi</a>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Tombol Buat Pesanan -->
+                <button id="create-order" class="w-full bg-primary-gold text-dark-bg font-bold py-4 rounded-lg hover:bg-yellow-600 transition duration-300 text-lg button-shadow">
+                    Buat Pesanan
+                </button>
+            </div>
+            
+            <!-- Bagian Kanan (Sidebar) -->
+            <div class="space-y-6">
+                <!-- Ringkasan Pesanan -->
+                <div class="bg-gray-bg p-6 rounded-xl border border-border-light card-shadow h-fit" id="order-summary">
+                    <!-- Ringkasan pesanan akan diisi oleh JavaScript -->
+                </div>
+                
+                <!-- Informasi Pengiriman -->
+                <div class="bg-gray-bg p-6 rounded-xl border border-border-light card-shadow">
+                    <h3 class="text-lg font-bold mb-4 text-light-text">Informasi Pengiriman</h3>
+                    
+                    <div class="space-y-4" id="shipping-info">
+                        <!-- Shipping info akan diisi oleh JavaScript -->
+                    </div>
+                </div>
+                
+                <!-- Informasi Pengiriman Detail -->
+                <div class="bg-gray-bg p-6 rounded-xl border border-border-light card-shadow">
+                    <h3 class="text-lg font-bold mb-4 text-light-text">Metode Pengiriman</h3>
+                    
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 text-primary-gold mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                            </svg>
+                            <span class="text-light-text" id="shipping-method">Pengiriman ke Rumah</span>
+                        </div>
+                        <span class="text-primary-gold font-bold">Gratis</span>
+                    </div>
+                </div>
+                
+                <!-- Catatan Keamanan -->
+                <div class="bg-gray-light p-6 rounded-xl border border-danger">
+                    <div class="flex items-start">
+                        <svg class="w-6 h-6 text-danger mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                        <div>
+                            <h4 class="text-danger font-bold">Waspada Penipuan</h4>
+                            <p class="text-danger text-sm mt-1">
+                                Luvyn tidak akan pernah meminta informasi pembayaran Anda melalui panggilan atau pesan teks. 
+                                Pastikan pembayaran hanya dilakukan melalui situs resmi ini.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark-bg border-t border-border-light mt-12 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-500 text-sm">
+            <p>&copy; 2024 Luvyn. Pencahayaan adalah Ekspresi Diri Anda.</p>
+            <p class="mt-2">Dirancang dengan Elegan. Dibuat dengan Hati.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="../shared.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCartCount();
+            renderOrderSummary();
+            renderShippingInfo();
+            
+            // Set event listeners
+            document.getElementById('create-order').addEventListener('click', function() {
+                if (document.getElementById('terms').checked) {
+                    // Simulate payment processing
+                    processPayment();
+                } else {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Perhatian',
+                        text: 'Mohon setujui Syarat & Ketentuan terlebih dahulu',
+                        background: '#000000',
+                        color: '#FFFFFF',
+                        iconColor: '#F59E0B',
+                        confirmButtonColor: '#FFD700',
+                    });
+                }
+            });
+        });
+
+        function renderOrderSummary() {
+            if (appState.cart.length === 0) {
+                document.getElementById('order-summary').innerHTML = `
+                    <h3 class="text-xl font-bold mb-4 text-light-text border-b border-border-light pb-3">Ringkasan Pesanan</h3>
+                    <div class="text-center py-10">
+                        <p class="text-gray-400">Belum ada produk dalam checkout.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const subtotal = appState.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const shipping = 0; // Gratis pengiriman ke rumah
+            const total = subtotal + shipping;
+
+            const orderSummaryHtml = `
+                <h3 class="text-xl font-bold mb-4 text-light-text border-b border-border-light pb-3">Ringkasan Pesanan</h3>
+
+                <div class="space-y-4 mb-6 max-h-80 overflow-y-auto pr-2">
+                    ${appState.cart.map(item => `
+                        <div class="flex items-center border-b border-border-light pb-3">
+                            <div class="w-14 h-14 overflow-hidden rounded-md flex-shrink-0 mr-3">
+                                <img src="${item.imageUrl}" alt="${item.name}" class="w-full h-full object-cover">
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-medium text-light-text text-sm">${item.name}</h4>
+                                <p class="text-xs text-gray-400">Qty: ${item.quantity}</p>
+                                <p class="text-primary-gold font-bold mt-1">${formatRupiah(item.price * item.quantity)}</p>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div class="space-y-3 text-base border-t border-border-light pt-4">
+                    <div class="flex justify-between">
+                        <span>Subtotal:</span>
+                        <span>${formatRupiah(subtotal)}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Biaya Pengiriman:</span>
+                        <span>${formatRupiah(shipping)}</span>
+                    </div>
+                    <div class="flex justify-between font-bold text-lg text-primary-gold border-t border-primary-gold pt-3">
+                        <span>Total:</span>
+                        <span id="payment-total">${formatRupiah(total)}</span>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('order-summary').innerHTML = orderSummaryHtml;
+        }
+
+        function renderShippingInfo() {
+            const shippingData = JSON.parse(sessionStorage.getItem('shippingData')) || {};
+            
+            if (Object.keys(shippingData).length > 0) {
+                document.getElementById('shipping-info').innerHTML = `
+                    <p class="text-light-text">
+                        <span class="text-gray-400">Kepada:</span> 
+                        ${shippingData.firstName} ${shippingData.lastName}
+                    </p>
+                    <p class="text-light-text">
+                        <span class="text-gray-400">Alamat:</span> 
+                        ${shippingData.address}, ${shippingData.city}, ${shippingData.province}, ${shippingData.postalCode}
+                    </p>
+                    <p class="text-light-text">
+                        <span class="text-gray-400">Telepon:</span> 
+                        ${shippingData.phone}
+                    </p>
+                `;
+                
+                // Update shipping method display
+                document.getElementById('shipping-method').textContent = 
+                    shippingData.shippingMethod === 'store' ? 'Ambil di Toko' : 'Pengiriman ke Rumah';
+            } else {
+                document.getElementById('shipping-info').innerHTML = `
+                    <p class="text-gray-400 text-sm">Data pengiriman tidak ditemukan. Silakan kembali ke halaman pengiriman.</p>
+                    <a href="checkout.html" class="text-primary-gold hover:underline text-sm">Kembali ke pengiriman</a>
+                `;
+            }
+        }
+
+        function processPayment() {
+            // Show payment processing modal
+            Swal.fire({
+                title: 'Memproses Pembayaran',
+                html: `
+                    <div class="flex justify-center py-4">
+                        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-gold"></div>
+                    </div>
+                    <p class="text-light-text">Silakan selesaikan pembayaran Anda</p>
+                `,
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                background: '#000000',
+                color: '#FFFFFF',
+            });
+
+            // Simulate payment processing
+            setTimeout(function() {
+                // Payment successful
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Pembayaran Berhasil!',
+                    text: 'Pesanan Anda telah berhasil diproses',
+                    background: '#000000',
+                    color: '#FFFFFF',
+                    iconColor: '#10B981',
+                    confirmButtonColor: '#FFD700',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Clear cart
+                        appState.cart = [];
+                        saveCartToLocalStorage();
+                        
+                        // Clear shipping data
+                        sessionStorage.removeItem('shippingData');
+                        
+                        // Redirect to success page
+                        window.location.href = 'index.html';
+                    }
+                });
+            }, 3000);
+        }
+
+        // Apply discount code
+        document.getElementById('apply-discount').addEventListener('click', function() {
+            const code = document.getElementById('discount-code').value.trim();
+            
+            if (code) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Kode tidak valid',
+                    text: 'Kode diskon "' + code + '" tidak ditemukan atau sudah kadaluarsa',
+                    background: '#000000',
+                    color: '#FFFFFF',
+                    iconColor: '#F59E0B',
+                    confirmButtonColor: '#FFD700',
+                });
+                
+                // Clear the discount code field
+                document.getElementById('discount-code').value = '';
+            } else {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Masukkan kode',
+                    text: 'Silakan masukkan kode diskon yang valid',
+                    background: '#000000',
+                    color: '#FFFFFF',
+                    iconColor: '#F59E0B',
+                    confirmButtonColor: '#FFD700',
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,11 +1,12 @@
 // --- Mock Data Produk ---
 const products = [
-    { id: 1, name: 'Lampu Gantung Nordic Emas', price: 1250000, category: 'Dekoratif', color: 'Emas', description: 'Siluet minimalis dengan finishing emas elegan, menciptakan fokus dramatis di ruang Anda. ', isFeatured: true, imageUrl: 'https://placehold.co/500x500/000000/FACC15?text=Lampu+Emas+Nordic' },
-    { id: 2, name: 'Lampu Meja Geometris Hitam', price: 450000, category: 'Fungsional', color: 'Hitam', description: 'Lampu meja fungsional dengan desain geometris hitam matte. Cahaya terfokus, ideal untuk membaca. ', isFeatured: true, imageUrl: 'https://placehold.co/500x500/000000/FFFFFF?text=Lampu+Meja+Hitam' },
-    { id: 3, name: 'Lampu Dinding Kristal', price: 980000, category: 'Dekoratif', color: 'Perak', description: 'Aksen lampu dinding kristal yang memancarkan cahaya lembut dan mewah. Sempurna untuk lorong. ', isFeatured: false, imageUrl: 'https://placehold.co/500x500/000000/E5E7EB?text=Lampu+Dinding+Kristal' },
-    { id: 4, name: 'Lampu Lantai Studio Putih', price: 1800000, category: 'Pencahayaan Rumah', color: 'Putih', description: 'Lampu lantai bergaya studio yang memberikan pencahayaan ambient yang merata dan terang. ', isFeatured: true, imageUrl: 'https://placehold.co/500x500/000000/FFFFFF?text=Lampu+Lantai+Putih' },
-    { id: 5, name: 'Lampu Track Hitam Klasik', price: 210000, category: 'Fungsional', color: 'Hitam', description: 'Lampu track yang dapat diatur untuk menyorot karya seni atau area spesifik. Efisien dan modern. ', isFeatured: false, imageUrl: 'https://placehold.co/500x500/000000/FFFFFF?text=Lampu+Track+Hitam' },
-    { id: 6, name: 'Lampu Gantung Bulat Minimalis', price: 650000, category: 'Dekoratif', color: 'Perak', description: 'Lampu gantung bulat dengan kabel tipis, menghadirkan kesan melayang dan ringan. ', isFeatured: false, imageUrl: 'https://placehold.co/500x500/000000/E5E7EB?text=Lampu+Gantung+Bulat' },
+    { id: 1, name: 'Lampu Gantung Nordic Emas', price: 1250000, category: 'Dekoratif', color: 'Emas', description: 'Siluet minimalis dengan finishing emas elegan, menciptakan fokus dramatis di ruang Anda. ', isFeatured: true, imageUrl: 'https://placehold.co/500x500/000000/FACC15?text=Lampu+Emas+Nordic', stock: 0 },
+    { id: 2, name: 'Lampu Meja Geometris Hitam', price: 450000, category: 'Fungsional', color: 'Hitam', description: 'Lampu meja fungsional dengan desain geometris hitam matte. Cahaya terfokus, ideal untuk membaca. ', isFeatured: true, imageUrl: 'https://placehold.co/500x500/000000/FFFFFF?text=Lampu+Meja+Hitam', stock: 0 },
+    { id: 3, name: 'Lampu Dinding Kristal', price: 980000, category: 'Dekoratif', color: 'Perak', description: 'Aksen lampu dinding kristal yang memancarkan cahaya lembut dan mewah. Sempurna untuk lorong. ', isFeatured: false, imageUrl: 'https://placehold.co/500x500/000000/E5E7EB?text=Lampu+Dinding+Kristal', stock: 0 },
+    { id: 4, name: 'Lampu Lantai Studio Putih', price: 1800000, category: 'Pencahayaan Rumah', color: 'Putih', description: 'Lampu lantai bergaya studio yang memberikan pencahayaan ambient yang merata dan terang. ', isFeatured: true, imageUrl: 'https://placehold.co/500x500/000000/FFFFFF?text=Lampu+Lantai+Putih', stock: 0 },
+    { id: 5, name: 'Lampu Track Hitam Klasik', price: 210000, category: 'Fungsional', color: 'Hitam', description: 'Lampu track yang dapat diatur untuk menyorot karya seni atau area spesifik. Efisien dan modern. ', isFeatured: false, imageUrl: 'https://placehold.co/500x500/000000/FFFFFF?text=Lampu+Track+Hitam', stock: 0 },
+    { id: 6, name: 'Lampu Gantung Bulat Minimalis', price: 650000, category: 'Dekoratif', color: 'Perak', description: 'Lampu gantung bulat dengan kabel tipis, menghadirkan kesan melayang dan ringan. ', isFeatured: false, imageUrl: 'https://placehold.co/500x500/000000/E5E7EB?text=Lampu+Gantung+Bulat', stock: 0 },
+    { id: 7, name: 'Smart Light', price: 55000, category: 'Fungsional', color: 'Putih', description: 'Lampu pintar dengan daya 12 watt yang hemat energi, dilengkapi kontrol otomatis dan konektivitas modern.', isFeatured: false, imageUrl: './images/produk/smart light.jpeg', stock: 10 },
 ];
 
 // --- State Management Sederhana ---
@@ -70,7 +71,7 @@ const addToCart = (productId) => {
         timer: 1500,
         ...successSwalConfig
     });
-    
+
     saveCartToLocalStorage();
     updateCartCount();
 };
@@ -86,7 +87,7 @@ const updateCartItemQuantity = (productId, newQuantity) => {
     }
     saveCartToLocalStorage();
     updateCartCount();
-    
+
     // Re-render cart page if we're on the cart page
     if (window.location.href.includes('cart.html')) {
         renderCartPage();
@@ -96,18 +97,32 @@ const updateCartItemQuantity = (productId, newQuantity) => {
 // --- Komponen Rendering ---
 
 const renderProductCard = (product) => {
+    // Tampilkan gambar coming-soon.jpeg jika produk tidak tersedia
+    const productImage = product.stock > 0 ? product.imageUrl : './images/produk/coming-soon.jpeg';
+    const isAvailable = product.stock > 0;
+
+    // Tambahan: nonaktifkan klik untuk produk yang tidak tersedia
+    const clickHandler = isAvailable ? `onclick="location.href='./detail.html?id=${product.id}'"` : '';
+    const cursorClass = isAvailable ? 'cursor-pointer' : 'cursor-not-allowed';
+    const hoverClass = isAvailable ? 'hover:border-primary-gold/50' : '';
+    const nameHoverClass = isAvailable ? 'hover:text-primary-gold' : '';
+    const imageClass = isAvailable ? 'transform hover:scale-105' : '';
+
     return `
-        <div class="product-card bg-dark-bg border border-white/10 rounded-xl overflow-hidden transition-all duration-300 hover:border-primary-gold/50 cursor-pointer p-4 md:p-6 shadow-2xl">
-            <div onclick="location.href='./detail.html?id=${product.id}'" class="space-y-4">
+        <div class="product-card bg-dark-bg border border-white/10 rounded-xl overflow-hidden transition-all duration-300 ${hoverClass} ${cursorClass} p-4 md:p-6 relative shadow-2xl">
+            <div ${clickHandler} class="space-y-4 ${!isAvailable ? 'pointer-events-none' : ''}">
                 <div class="glow-effect aspect-square overflow-hidden rounded-lg transition-all duration-300">
-                    <img src="${product.imageUrl}" alt="${product.name}" class="w-full h-full object-cover transform hover:scale-105 transition duration-500">
+                    <img src="${productImage}" alt="${product.name}" class="w-full h-full object-cover ${imageClass} transition duration-500 ${!isAvailable ? 'opacity-60' : ''}">
                 </div>
-                <h3 class="text-xl font-semibold text-light-text hover:text-primary-gold transition duration-200">${product.name}</h3>
+                <h3 class="text-xl font-semibold text-light-text ${nameHoverClass} transition duration-200">${product.name}</h3>
                 <p class="text-2xl font-bold text-primary-gold">${formatRupiah(product.price)}</p>
+                ${!isAvailable ? '<p class="text-red-500 font-semibold">Tidak Tersedia</p>' : ''}
             </div>
-            <button onclick="addToCart(${product.id})" class="mt-4 w-full bg-light-text text-dark-bg py-2 rounded-lg font-medium hover:bg-white transition duration-300 border border-light-text">
-                Tambahkan ke Keranjang
-            </button>
+            ${isAvailable ? 
+                '<button onclick="addToCart(' + product.id + ')" class="mt-4 w-full bg-light-text text-dark-bg py-2 rounded-lg font-medium hover:bg-white transition duration-300 border border-light-text">Tambahkan ke Keranjang</button>' : 
+                '<button class="mt-4 w-full bg-gray-500 text-light-text py-2 rounded-lg font-medium cursor-not-allowed" disabled>Produk Tidak Tersedia</button>'
+            }
+            ${!isAvailable ? '<div class="absolute inset-0 bg-black bg-opacity-40 rounded-xl flex items-center justify-center"><span class="text-white font-bold text-center px-2">Tidak Tersedia</span></div>' : ''}
         </div>
     `;
 };
@@ -134,7 +149,7 @@ const renderDetailPage = (product) => {
                         <ul class="space-y-1 text-sm text-gray-400">
                             <li>Kategori: <span class="text-light-text">${product.category}</span></li>
                             <li>Warna Aksen: <span class="text-light-text">${product.color}</span></li>
-                            <li>Daya: <span class="text-light-text">40 Watt (Max)</span></li>
+                            <li>Daya: <span class="text-light-text">12 Watt</span></li>
                             <li>Material: <span class="text-light-text">Besi & Akrilik</span></li>
                         </ul>
                     </div>
@@ -161,7 +176,7 @@ const renderDetailPage = (product) => {
 const renderCartPage = () => {
     const container = document.getElementById('cart-items-container');
     const summaryContainer = document.getElementById('checkout-summary');
-    
+
     if (!container || !summaryContainer) return;
 
     if (appState.cart.length === 0) {
@@ -180,7 +195,7 @@ const renderCartPage = () => {
     }
 
     const subtotal = appState.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const shipping = 50000; // Contoh biaya pengiriman
+    const shipping = 0; // Biaya pengiriman gratis
     const total = subtotal + shipping;
 
     const cartItemsHtml = appState.cart.map(item => {
@@ -191,13 +206,13 @@ const renderCartPage = () => {
                 <div class="w-20 h-20 overflow-hidden rounded-md flex-shrink-0">
                     <img src="${item.imageUrl}" alt="${item.name}" class="w-full h-full object-cover">
                 </div>
-                
+
                 <!-- Nama & Detail -->
                 <div class="flex-grow">
                     <h3 class="text-lg font-semibold text-light-text">${item.name}</h3>
                     <p class="text-primary-gold font-medium">${formatRupiah(item.price)}</p>
                 </div>
-                
+
                 <!-- Kuantitas -->
                 <div class="flex items-center border border-white/20 rounded-md">
                     <button onclick="updateCartItemQuantity(${item.productId}, ${item.quantity - 1})" class="p-2 hover:bg-white/10 rounded-l">-</button>
@@ -220,7 +235,7 @@ const renderCartPage = () => {
 
     summaryContainer.innerHTML = `
         <h3 class="text-2xl font-bold mb-6 text-light-text border-b border-white/10 pb-3">Ringkasan Pesanan</h3>
-        
+
         <div class="space-y-3 text-lg">
             <div class="flex justify-between">
                 <span>Subtotal:</span>
@@ -236,7 +251,7 @@ const renderCartPage = () => {
             </div>
         </div>
 
-        <button onclick="simulateCheckout('${formatRupiah(total)}')" class="mt-8 w-full bg-primary-gold text-dark-bg text-lg font-bold py-3 rounded-full hover:bg-yellow-300 transition duration-300">
+        <button onclick="window.location.href='checkout.html'" class="mt-8 w-full bg-primary-gold text-dark-bg text-lg font-bold py-3 rounded-full hover:bg-yellow-300 transition duration-300">
             Lanjutkan ke Checkout
         </button>
     `;
@@ -249,6 +264,7 @@ const darkSwalConfig = {
     confirmButtonColor: '#FACC15',
 };
 
+// Update the theme configuration to use gold color #FFD700
 const successSwalConfig = {
     ...darkSwalConfig,
     iconColor: '#4ADE80', // Warna sukses hijau muda
@@ -259,11 +275,7 @@ const errorSwalConfig = {
     iconColor: '#F87171', // Warna error merah muda
 };
 
-// Fungsi untuk redirect ke halaman checkout
-function simulateCheckout(total) {
-    console.log('Redirecting to checkout. Total: ' + total);
-    window.location.href = 'checkout.html';
-}
+// The function simulateCheckout is no longer needed as we redirect directly
 
 const renderShopPage = () => {
     const { category, color } = appState.filters;
@@ -278,7 +290,7 @@ const renderShopPage = () => {
 
     const container = document.getElementById('product-grid');
     const noProductsMessage = document.getElementById('no-products-message');
-    
+
     if (!container || !noProductsMessage) return;
 
     if (filteredProducts.length > 0) {

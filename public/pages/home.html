@@ -44,14 +44,21 @@
         .bg-gradient-radial {
             background: radial-gradient(circle, var(--tw-gradient-stops));
         }
+        
+        /* CSS untuk navbar logo */
+        .navbar-logo {
+            height: 50px;
+            object-fit: contain;
+        }
     </style>
 </head>
 
 <body class="bg-dark-bg text-light-text font-sans antialiased min-h-screen flex flex-col">
     <!-- Header & Navigation -->
     <header class="sticky top-0 z-50 bg-dark-bg bg-opacity-95 backdrop-blur-sm shadow-md">
+        <!-- update: ganti teks Luvyn dengan logo -->
         <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-            <a href="./index.html" class="text-3xl font-bold text-primary-gold glow-text tracking-widest">Luvyn</a>
+            <a href="./index.html"><img src="/images/logo/logo.jpeg" alt="Luvyn Logo" class="navbar-logo"></a>
             <div class="hidden md:flex space-x-8 items-center text-lg">
                 <a href="./index.html" class="hover:text-primary-gold transition duration-200">Home</a>
                 <a href="./shop.html" class="hover:text-primary-gold transition duration-200">Koleksi</a>
